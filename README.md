@@ -1,6 +1,6 @@
 # River Sync for Obsidian
 
-Automatically sync emails and SMS messages from River into your Obsidian vault with AI-enhanced content processing.
+Email yourself quick notes and ideas throughout the day. River captures everything and syncs to Obsidian with AI-enhanced tagging.
 
 ## ⚠️ Requirements
 
@@ -8,8 +8,7 @@ This plugin connects to [River](https://river.dev), a paid service for managing 
 
 **Pricing:**
 
-- Free tier: 100 messages/month
-- Pro tier: $9/month - unlimited messages
+- $5/month or $50/year - unlimited messages
 - [Sign up at river.dev](https://river.dev)
 
 The plugin itself is free and open source. You need a River account to use it.
@@ -20,7 +19,7 @@ The plugin itself is free and open source. You need a River account to use it.
 - 📱 **SMS/MMS syncing** - Sync text messages and attachments
 - 🤖 **AI enhancement** - Messages are processed and formatted by AI
 - 🏷️ **Auto-tagging** - Smart topic detection and linking
-- 📅 **Event detection** - Automatically detect calendar events
+- 📅 **Event detection** - Automatically detect calendar events, add them to Google Calendar
 - 🔄 **Automatic syncing** - Configurable intervals or manual sync
 - 🔐 **OAuth authentication** - One-click secure connection
 
