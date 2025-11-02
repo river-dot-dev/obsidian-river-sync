@@ -1,0 +1,22 @@
+# Logs
+*.log
+
+# Build output
+#main.js
+#main.js.map
+#*.js.map
+
+# Dependencies
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.obsidian/
+test-vault/
