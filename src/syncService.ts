@@ -91,4 +91,11 @@ export class SyncService {
     this.settings = settings;
     this.noteCreator = new NoteCreator(this.app, settings);
   }
+
+  /**
+   * Update the client reference (called when credentials change)
+   */
+  updateClient(client: RiverClient): void {
+    this.client = client;
+  }
 }

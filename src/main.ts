@@ -83,8 +83,9 @@ export default class RiverPlugin extends Plugin {
       this.settings.smsApiUrl,
     );
 
-    // Update sync service settings
+    // Update sync service with new settings and client
     this.syncService.updateSettings(this.settings);
+    this.syncService.updateClient(this.client);
 
     // Restart periodic sync with new interval
     this.stopPeriodicSync();

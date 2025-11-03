@@ -282,6 +282,7 @@ var RiverClient = class {
           day: "numeric",
           hour: "numeric",
           minute: "2-digit",
+          second: "2-digit",
           hour12: true
         });
         return {
@@ -568,6 +569,12 @@ var SyncService = class {
     this.settings = settings;
     this.noteCreator = new NoteCreator(this.app, settings);
   }
+  /**
+   * Update the client reference (called when credentials change)
+   */
+  updateClient(client) {
+    this.client = client;
+  }
 };
 
 // src/main.ts
@@ -627,6 +634,7 @@ var RiverPlugin = class extends import_obsidian3.Plugin {
       this.settings.smsApiUrl
     );
     this.syncService.updateSettings(this.settings);
+    this.syncService.updateClient(this.client);
     this.stopPeriodicSync();
     if (this.settings.syncInterval > 0) {
       this.startPeriodicSync();
