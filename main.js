@@ -85,7 +85,7 @@ var RiverSettingTab = class extends import_obsidian.PluginSettingTab {
         await this.plugin.saveSettings();
       })
     );
-    new import_obsidian.Setting(containerEl).setName("Add frontmatter").setDesc("Add YAML frontmatter to synced notes").addToggle(
+    new import_obsidian.Setting(containerEl).setName("Add frontmatter").setDesc("Add metadata properties to synced notes (received date, topics)").addToggle(
       (toggle) => toggle.setValue(this.plugin.settings.addFrontmatter).onChange(async (value) => {
         this.plugin.settings.addFrontmatter = value;
         await this.plugin.saveSettings();
@@ -277,17 +277,9 @@ var RiverClient = class {
       console.log(`River: Found ${data.messages.length} pending SMS`);
       return data.messages.map((sms) => {
         const receivedDate = new Date(sms.received_at);
-        const timestamp = receivedDate.toLocaleString("en-US", {
-          month: "short",
-          day: "numeric",
-          hour: "numeric",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: true
-        });
         return {
           id: String(sms.id),
-          subject: `SMS from ${sms.from_phone} - ${timestamp}`,
+          subject: sms.ai_summary || "SMS Note",
           content: sms.ai_enhanced_content || sms.body,
           urls: sms.detected_urls || [],
           topics: sms.suggested_topics || [],
@@ -390,7 +382,7 @@ var NoteCreator = class {
    * Generate filename for the note
    */
   generateFilename(email) {
-    const date = (0, import_obsidian2.moment)(email.receivedAt).format(this.settings.dateFormat);
+    const date = (0, import_obsidian2.moment)(email.receivedAt).format("MM/DD/YYYY");
     const sanitizedSubject = this.sanitizeFilename(email.subject);
     return `${date} - ${sanitizedSubject}.md`;
   }
@@ -442,11 +434,7 @@ var NoteCreator = class {
   generateFrontmatter(email) {
     var _a, _b;
     let frontmatter = "---\n";
-    frontmatter += `river_id: ${email.id}
-`;
-    frontmatter += `type: ${email.contentType}
-`;
-    frontmatter += `received: ${(0, import_obsidian2.moment)(email.receivedAt).format("YYYY-MM-DD HH:mm")}
+    frontmatter += `received: ${(0, import_obsidian2.moment)(email.receivedAt).format("MM/DD/YYYY hh:mm A")}
 `;
     if (email.topics && email.topics.length > 0) {
       frontmatter += `topics:

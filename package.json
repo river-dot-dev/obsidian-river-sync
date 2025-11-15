@@ -1,6 +1,6 @@
 {
   "name": "@river/obsidian-plugin",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "River Sync - Obsidian plugin for syncing AI-processed emails",
   "main": "main.js",
   "scripts": {
