@@ -95,20 +95,11 @@ export class RiverClient {
 
       // Transform SMS messages to PendingEmail format
       return data.messages.map((sms: any) => {
-        // Format timestamp for unique note titles
         const receivedDate = new Date(sms.received_at);
-        const timestamp = receivedDate.toLocaleString("en-US", {
-          month: "short",
-          day: "numeric",
-          hour: "numeric",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: true,
-        });
 
         return {
           id: String(sms.id),
-          subject: `SMS from ${sms.from_phone} - ${timestamp}`,
+          subject: sms.ai_summary || "SMS Note",
           content: sms.ai_enhanced_content || sms.body,
           urls: sms.detected_urls || [],
           topics: sms.suggested_topics || [],
