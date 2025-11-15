@@ -110,7 +110,7 @@ export class RiverSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Add frontmatter")
-      .setDesc("Add YAML frontmatter to synced notes")
+      .setDesc("Add metadata properties to synced notes (received date, topics)")
       .addToggle((toggle) =>
         toggle
           .setValue(this.plugin.settings.addFrontmatter)
