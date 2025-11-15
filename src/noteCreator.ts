@@ -40,7 +40,7 @@ export class NoteCreator {
    * Generate filename for the note
    */
   private generateFilename(email: PendingEmail): string {
-    const date = moment(email.receivedAt).format(this.settings.dateFormat);
+    const date = moment(email.receivedAt).format("MM/DD/YYYY");
     const sanitizedSubject = this.sanitizeFilename(email.subject);
     return `${date} - ${sanitizedSubject}.md`;
   }
@@ -99,9 +99,7 @@ export class NoteCreator {
    */
   private generateFrontmatter(email: PendingEmail): string {
     let frontmatter = "---\n";
-    frontmatter += `river_id: ${email.id}\n`;
-    frontmatter += `type: ${email.contentType}\n`;
-    frontmatter += `received: ${moment(email.receivedAt).format("YYYY-MM-DD HH:mm")}\n`;
+    frontmatter += `received: ${moment(email.receivedAt).format("MM/DD/YYYY hh:mm A")}\n`;
 
     if (email.topics && email.topics.length > 0) {
       frontmatter += `topics:\n`;
