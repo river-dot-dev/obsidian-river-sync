@@ -40,20 +40,24 @@ export class NoteCreator {
    * Generate filename for the note
    */
   private generateFilename(email: PendingEmail): string {
-    const date = moment(email.receivedAt).format("MM/DD/YYYY");
+    const date = moment(email.receivedAt).format("MM-DD-YYYY");
     const sanitizedSubject = this.sanitizeFilename(email.subject);
-    return `${date} - ${sanitizedSubject}.md`;
+    // Sanitize the entire filename to be extra safe
+    const fullFilename = `${date} - ${sanitizedSubject}`;
+    return this.sanitizeFilename(fullFilename) + ".md";
   }
 
   /**
    * Sanitize filename by removing invalid characters
+   * Ensures filename is filesystem-safe across all platforms
    */
   private sanitizeFilename(filename: string): string {
     return filename
-      .replace(/[\\/:*?"<>|]/g, "") // Remove invalid characters
-      .replace(/\s+/g, " ") // Collapse multiple spaces
+      .replace(/[\\/:*?"<>|]/g, "") // Remove Windows/Unix invalid chars
+      .replace(/\s+/g, " ") // Collapse multiple spaces to single space
+      .replace(/^\.+/, "") // Remove leading dots (hidden files)
       .trim()
-      .substring(0, 100); // Limit length
+      .substring(0, 200); // Limit length (was 100, increased for date + title)
   }
 
   /**
