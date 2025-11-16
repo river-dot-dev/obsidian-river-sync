@@ -382,15 +382,17 @@ var NoteCreator = class {
    * Generate filename for the note
    */
   generateFilename(email) {
-    const date = (0, import_obsidian2.moment)(email.receivedAt).format("MM/DD/YYYY");
+    const date = (0, import_obsidian2.moment)(email.receivedAt).format("MM-DD-YYYY");
     const sanitizedSubject = this.sanitizeFilename(email.subject);
-    return `${date} - ${sanitizedSubject}.md`;
+    const fullFilename = `${date} - ${sanitizedSubject}`;
+    return this.sanitizeFilename(fullFilename) + ".md";
   }
   /**
    * Sanitize filename by removing invalid characters
+   * Ensures filename is filesystem-safe across all platforms
    */
   sanitizeFilename(filename) {
-    return filename.replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, " ").trim().substring(0, 100);
+    return filename.replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, " ").replace(/^\.+/, "").trim().substring(0, 200);
   }
   /**
    * Generate markdown content for the note
