@@ -1,11 +1,12 @@
 {
-  "id": "river-sync",
-  "name": "River Sync",
-  "version": "1.0.4",
+  "id": "river",
+  "name": "River",
+  "version": "1.0.5",
   "minAppVersion": "1.0.0",
-  "description": "Sync emails and SMS from River into your Obsidian vault with AI-enhanced content processing",
-  "author": "Dustin Lyons",
-  "authorUrl": "https://github.com/dustinlyons",
+  "description": "Quick capture via SMS and email into your Obsidian Vault.",
+  "author": "river-dot-dev",
+  "authorUrl": "https://github.com/river-dot-dev",
   "fundingUrl": "https://river.dev/pricing",
   "isDesktopOnly": false
 }
+
