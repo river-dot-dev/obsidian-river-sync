@@ -1,9 +1,9 @@
 {
   "id": "river",
   "name": "River",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "minAppVersion": "1.0.0",
-  "description": "Quick capture via SMS and email into your Obsidian Vault.",
+  "description": "Quick capture via SMS and email into your vault.",
   "author": "river-dot-dev",
   "authorUrl": "https://github.com/river-dot-dev",
   "fundingUrl": "https://river.dev/pricing",
