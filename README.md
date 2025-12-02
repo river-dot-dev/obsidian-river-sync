@@ -154,7 +154,6 @@ npm run build
 
 ## Roadmap
 
-- [ ] Bi-directional sync (create messages from Obsidian)
 - [ ] Custom templates for different message types
 - [ ] Bulk operations (archive, delete, move)
 - [ ] Search and filter in staging ground
