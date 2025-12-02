@@ -1,6 +1,6 @@
 # River Sync for Obsidian
 
-Email yourself quick notes and ideas throughout the day. River captures everything and syncs to Obsidian with AI-enhanced tagging.
+Email or SMS yourself quick notes and ideas throughout the day. River captures everything and syncs to Obsidian with AI-enhanced tagging.
 
 ## ⚠️ Requirements
 
