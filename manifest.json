@@ -1,7 +1,7 @@
 {
   "id": "river",
   "name": "River",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "minAppVersion": "1.0.0",
   "description": "Quick capture via SMS and email into your vault.",
   "author": "river-dot-dev",
