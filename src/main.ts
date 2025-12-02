@@ -96,41 +96,41 @@ export default class RiverPlugin extends Plugin {
 
   async syncNotes() {
     if (!this.settings.userId || !this.settings.token) {
-      new Notice("⚠️ Please connect to River in settings first");
+      new Notice("Please connect to River in settings first");
       return;
     }
 
     try {
-      new Notice("🔄 Syncing notes from River...");
+      new Notice("Syncing notes from River...");
       const count = await this.syncService.syncPendingNotes();
 
       if (count > 0) {
         new Notice(
-          `✅ Synced ${count} note${count !== 1 ? "s" : ""} from River`,
+          `Synced ${count} note${count !== 1 ? "s" : ""} from River`,
         );
       } else {
-        new Notice("✓ No new notes to sync");
+        new Notice("No new notes to sync");
       }
     } catch (error) {
       console.error("River sync failed:", error);
-      new Notice(`❌ Sync failed: ${error.message}`);
+      new Notice(`Sync failed: ${error.message}`);
     }
   }
 
   async testConnection() {
-    new Notice("🔍 Testing River connection...");
+    new Notice("Testing connection...");
 
     try {
       const isConnected = await this.client.testConnection();
 
       if (isConnected) {
-        new Notice("✅ Connected to River successfully!");
+        new Notice("Connected to River successfully!");
       } else {
-        new Notice("❌ Failed to connect to River. Check your API URL.");
+        new Notice("Failed to connect to River. Check your API URL.");
       }
     } catch (error) {
       console.error("River connection test failed:", error);
-      new Notice(`❌ Connection test failed: ${error.message}`);
+      new Notice(`Connection test failed: ${error.message}`);
     }
   }
 

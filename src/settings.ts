@@ -43,8 +43,6 @@ export class RiverSettingTab extends PluginSettingTab {
 
     containerEl.empty();
 
-    new Setting(containerEl).setName("River sync settings").setHeading();
-
     // Connection Status Section
     this.displayConnectionStatus(containerEl);
 
@@ -145,7 +143,7 @@ export class RiverSettingTab extends PluginSettingTab {
       // Connected state
       const statusDiv = section.createDiv({ cls: "river-status-connected" });
       statusDiv.createEl("p", {
-        text: "✅ Connected to River",
+        text: "Connected to River",
       });
 
       new Setting(section)
@@ -166,7 +164,7 @@ export class RiverSettingTab extends PluginSettingTab {
       // Not connected state
       const statusDiv = section.createDiv({ cls: "river-status-disconnected" });
       statusDiv.createEl("p", {
-        text: "⚠️ Not connected to River",
+        text: "Not connected to River",
       });
 
       new Setting(section)
@@ -265,7 +263,7 @@ export class RiverSettingTab extends PluginSettingTab {
         // Show success message
         const successDiv = document.createElement("div");
         successDiv.className = "river-success";
-        successDiv.textContent = "✅ Successfully connected to River!";
+        successDiv.textContent = "Successfully connected to River!";
         this.containerEl.insertBefore(
           successDiv,
           this.containerEl.firstChild,
