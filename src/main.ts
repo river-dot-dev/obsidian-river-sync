@@ -11,7 +11,7 @@ export default class RiverPlugin extends Plugin {
   syncInterval: number | null = null;
 
   async onload() {
-    console.log("Loading River Sync plugin");
+    console.debug("Loading River Sync plugin");
 
     // Load settings
     await this.loadSettings();
@@ -31,8 +31,8 @@ export default class RiverPlugin extends Plugin {
 
     // Add command for manual sync
     this.addCommand({
-      id: "sync-river-notes",
-      name: "Sync notes from River",
+      id: "sync-notes",
+      name: "Sync notes",
       callback: async () => {
         await this.syncNotes();
       },
@@ -40,8 +40,8 @@ export default class RiverPlugin extends Plugin {
 
     // Add command to test connection
     this.addCommand({
-      id: "test-river-connection",
-      name: "Test River connection",
+      id: "test-connection",
+      name: "Test connection",
       callback: async () => {
         await this.testConnection();
       },
@@ -54,7 +54,7 @@ export default class RiverPlugin extends Plugin {
     if (this.settings.syncOnStartup) {
       // Delay startup sync by 2 seconds to let Obsidian fully load
       setTimeout(() => {
-        this.syncNotes();
+        void this.syncNotes();
       }, 2000);
     }
 
@@ -64,8 +64,8 @@ export default class RiverPlugin extends Plugin {
     }
   }
 
-  async onunload() {
-    console.log("Unloading River Sync plugin");
+  onunload() {
+    console.debug("Unloading River Sync plugin");
     this.stopPeriodicSync();
   }
 
@@ -136,18 +136,18 @@ export default class RiverPlugin extends Plugin {
 
   startPeriodicSync() {
     const intervalMs = this.settings.syncInterval * 60 * 1000;
-    console.log(
+    console.debug(
       `River: Starting periodic sync every ${this.settings.syncInterval} minutes`,
     );
 
     this.syncInterval = window.setInterval(() => {
-      this.syncNotes();
+      void this.syncNotes();
     }, intervalMs);
   }
 
   stopPeriodicSync() {
     if (this.syncInterval !== null) {
-      console.log("River: Stopping periodic sync");
+      console.debug("River: Stopping periodic sync");
       window.clearInterval(this.syncInterval);
       this.syncInterval = null;
     }

@@ -25,13 +25,13 @@ export class NoteCreator {
     // Check if file already exists
     const existingFile = this.app.vault.getAbstractFileByPath(filepath);
     if (existingFile instanceof TFile) {
-      console.log(`River: File already exists, updating: ${filepath}`);
+      console.debug(`River: File already exists, updating: ${filepath}`);
       await this.app.vault.modify(existingFile, content);
       return existingFile;
     }
 
     // Create new file
-    console.log(`River: Creating note: ${filepath}`);
+    console.debug(`River: Creating note: ${filepath}`);
     const file = await this.app.vault.create(filepath, content);
     return file;
   }
@@ -162,7 +162,7 @@ export class NoteCreator {
 
     const exists = this.app.vault.getAbstractFileByPath(folder);
     if (!exists) {
-      console.log(`River: Creating folder: ${folder}`);
+      console.debug(`River: Creating folder: ${folder}`);
       await this.app.vault.createFolder(folder);
     }
   }

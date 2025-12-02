@@ -1,8 +1,10 @@
+import { requestUrl } from "obsidian";
 import type {
   PendingEmail,
   SyncResponse,
   MarkSyncedResponse,
   ObsidianMetadata,
+  SmsApiResponse,
 } from "./types";
 
 export class RiverClient {
@@ -28,23 +30,23 @@ export class RiverClient {
     }
 
     const url = `${this.apiUrl}/api/staging/${this.userId}/pending`;
-    console.log(`River: Fetching pending emails from ${url}`);
+    console.debug(`River: Fetching pending emails from ${url}`);
 
-    const response = await fetch(url);
+    const response = await requestUrl(url);
 
-    if (!response.ok) {
+    if (response.status >= 400) {
       throw new Error(
-        `Failed to fetch pending emails: ${response.status} ${response.statusText}`,
+        `Failed to fetch pending emails: ${response.status}`,
       );
     }
 
-    const data: SyncResponse = await response.json();
+    const data: SyncResponse = response.json;
 
     if (!data.success) {
       throw new Error("API returned success=false");
     }
 
-    console.log(`River: Found ${data.count} pending emails`);
+    console.debug(`River: Found ${data.count} pending emails`);
 
     // Mark all emails with source
     const emails = data.emails.map((email) => ({
@@ -57,7 +59,7 @@ export class RiverClient {
 
     // Merge and return
     const allMessages = [...emails, ...smsMessages];
-    console.log(
+    console.debug(
       `River: Total pending messages: ${allMessages.length} (${emails.length} emails, ${smsMessages.length} SMS)`,
     );
     return allMessages;
@@ -73,28 +75,28 @@ export class RiverClient {
 
     try {
       const url = `${this.smsApiUrl}/api/sms/staging/pending?userId=${this.userId}`;
-      console.log(`River: Fetching pending SMS from ${url}`);
+      console.debug(`River: Fetching pending SMS from ${url}`);
 
-      const response = await fetch(url);
+      const response = await requestUrl(url);
 
-      if (!response.ok) {
+      if (response.status >= 400) {
         console.warn(
           `River: Failed to fetch SMS (${response.status}), continuing with emails only`,
         );
         return [];
       }
 
-      const data = await response.json();
+      const data = response.json;
 
       if (!data.messages || !Array.isArray(data.messages)) {
         console.warn("River: Invalid SMS response format");
         return [];
       }
 
-      console.log(`River: Found ${data.messages.length} pending SMS`);
+      console.debug(`River: Found ${data.messages.length} pending SMS`);
 
       // Transform SMS messages to PendingEmail format
-      return data.messages.map((sms: any) => {
+      return data.messages.map((sms: SmsApiResponse) => {
         const receivedDate = new Date(sms.received_at);
 
         return {
@@ -132,9 +134,10 @@ export class RiverClient {
     if (source === "sms") {
       // Mark SMS as synced
       const url = `${this.smsApiUrl}/api/sms/staging/${messageId}/synced`;
-      console.log(`River: Marking SMS ${messageId} as synced`);
+      console.debug(`River: Marking SMS ${messageId} as synced`);
 
-      const response = await fetch(url, {
+      const response = await requestUrl({
+        url,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -142,9 +145,9 @@ export class RiverClient {
         body: JSON.stringify({ obsidianMetadata: metadata }),
       });
 
-      if (!response.ok) {
+      if (response.status >= 400) {
         throw new Error(
-          `Failed to mark SMS as synced: ${response.status} ${response.statusText}`,
+          `Failed to mark SMS as synced: ${response.status}`,
         );
       }
 
@@ -153,9 +156,10 @@ export class RiverClient {
 
     // Mark email as synced
     const url = `${this.apiUrl}/api/staging/${messageId}/mark-synced`;
-    console.log(`River: Marking email ${messageId} as synced`);
+    console.debug(`River: Marking email ${messageId} as synced`);
 
-    const response = await fetch(url, {
+    const response = await requestUrl({
+      url,
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -163,13 +167,13 @@ export class RiverClient {
       body: JSON.stringify({ obsidianMetadata: metadata }),
     });
 
-    if (!response.ok) {
+    if (response.status >= 400) {
       throw new Error(
-        `Failed to mark email as synced: ${response.status} ${response.statusText}`,
+        `Failed to mark email as synced: ${response.status}`,
       );
     }
 
-    const data: MarkSyncedResponse = await response.json();
+    const data: MarkSyncedResponse = response.json;
 
     if (!data.success) {
       throw new Error("Failed to mark email as synced");
@@ -182,8 +186,8 @@ export class RiverClient {
   async testConnection(): Promise<boolean> {
     try {
       const url = `${this.apiUrl}/health`;
-      const response = await fetch(url);
-      return response.ok;
+      const response = await requestUrl(url);
+      return response.status < 400;
     } catch (error) {
       console.error("River: Connection test failed:", error);
       return false;

@@ -39,5 +39,18 @@ export interface MarkSyncedResponse {
 export interface ObsidianMetadata {
   notePath: string;
   tags?: string[];
-  frontmatter?: Record<string, any>;
+  frontmatter?: Record<string, unknown>;
+}
+
+export interface SmsApiResponse {
+  id: number;
+  ai_summary?: string;
+  ai_enhanced_content?: string;
+  body: string;
+  detected_urls?: string[];
+  suggested_topics?: string[];
+  received_at: string;
+  content_type?: string;
+  event_details?: string;
+  from_phone?: string;
 }

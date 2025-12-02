@@ -22,17 +22,17 @@ export class SyncService {
    * Returns the number of notes synced
    */
   async syncPendingNotes(): Promise<number> {
-    console.log("River: Starting sync...");
+    console.debug("River: Starting sync...");
 
     // Fetch pending emails
     const emails = await this.client.getPendingEmails();
 
     if (emails.length === 0) {
-      console.log("River: No pending emails to sync");
+      console.debug("River: No pending emails to sync");
       return 0;
     }
 
-    console.log(`River: Syncing ${emails.length} emails...`);
+    console.debug(`River: Syncing ${emails.length} emails...`);
 
     let syncedCount = 0;
     const errors: string[] = [];
@@ -52,7 +52,7 @@ export class SyncService {
       console.warn(`River: ${errors.length} emails failed to sync:`, errors);
     }
 
-    console.log(
+    console.debug(
       `River: Sync complete. Synced ${syncedCount}/${emails.length} emails`,
     );
     return syncedCount;
@@ -62,7 +62,7 @@ export class SyncService {
    * Sync a single email
    */
   private async syncEmail(email: PendingEmail): Promise<void> {
-    console.log(`River: Syncing email: ${email.subject}`);
+    console.debug(`River: Syncing email: ${email.subject}`);
 
     // Create the note
     const file = await this.noteCreator.createNote(email);
@@ -81,7 +81,7 @@ export class SyncService {
     // Mark as synced in River (pass source to use correct endpoint)
     await this.client.markAsSynced(email.id, metadata, email.source || "email");
 
-    console.log(`River: Successfully synced: ${email.subject} -> ${file.path}`);
+    console.debug(`River: Successfully synced: ${email.subject} -> ${file.path}`);
   }
 
   /**

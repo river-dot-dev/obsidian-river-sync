@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
+import { App, PluginSettingTab, Setting, requestUrl } from "obsidian";
 import type RiverPlugin from "./main";
 
 export interface RiverPluginSettings {
@@ -43,13 +43,13 @@ export class RiverSettingTab extends PluginSettingTab {
 
     containerEl.empty();
 
-    containerEl.createEl("h2", { text: "River Sync Settings" });
+    new Setting(containerEl).setName("River sync settings").setHeading();
 
     // Connection Status Section
     this.displayConnectionStatus(containerEl);
 
     // Sync Configuration
-    containerEl.createEl("h3", { text: "Sync Configuration" });
+    new Setting(containerEl).setName("Sync configuration").setHeading();
 
     new Setting(containerEl)
       .setName("Sync on startup")
@@ -80,7 +80,7 @@ export class RiverSettingTab extends PluginSettingTab {
       );
 
     // Note Organization
-    containerEl.createEl("h3", { text: "Note Organization" });
+    new Setting(containerEl).setName("Note organization").setHeading();
 
     new Setting(containerEl)
       .setName("Inbox folder")
@@ -136,7 +136,7 @@ export class RiverSettingTab extends PluginSettingTab {
 
   displayConnectionStatus(containerEl: HTMLElement): void {
     const section = containerEl.createDiv({ cls: "river-connection-section" });
-    section.createEl("h3", { text: "Connection" });
+    new Setting(section).setName("Connection").setHeading();
 
     const isConnected =
       this.plugin.settings.userId && this.plugin.settings.token;
@@ -186,21 +186,19 @@ export class RiverSettingTab extends PluginSettingTab {
   async initiateOAuthFlow(): Promise<void> {
     try {
       // Create OAuth session
-      const response = await fetch(
-        `${this.plugin.settings.syncApiUrl}/api/oauth/session`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+      const response = await requestUrl({
+        url: `${this.plugin.settings.syncApiUrl}/api/oauth/session`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+      });
 
-      if (!response.ok) {
+      if (response.status >= 400) {
         throw new Error("Failed to create OAuth session");
       }
 
-      const data = await response.json();
+      const data = response.json;
 
       if (!data.success) {
         throw new Error(data.error || "Failed to create OAuth session");
@@ -225,58 +223,65 @@ export class RiverSettingTab extends PluginSettingTab {
     let attempts = 0;
     const maxAttempts = 90; // 15 minutes (90 * 10 seconds)
 
-    this.pollingInterval = window.setInterval(async () => {
+    this.pollingInterval = window.setInterval(() => {
+      void this.pollSession(sessionId, attempts, maxAttempts);
       attempts++;
+    }, 2000); // Poll every 2 seconds
+  }
 
-      if (attempts > maxAttempts) {
-        this.stopPolling();
-        console.log("OAuth session expired");
-        return;
+  private async pollSession(
+    sessionId: string,
+    attempts: number,
+    maxAttempts: number,
+  ): Promise<void> {
+    if (attempts > maxAttempts) {
+      this.stopPolling();
+      console.warn("OAuth session expired");
+      return;
+    }
+
+    try {
+      const response = await requestUrl(
+        `${this.plugin.settings.syncApiUrl}/api/oauth/session/${sessionId}`,
+      );
+
+      if (response.status >= 400) {
+        throw new Error("Failed to check session status");
       }
 
-      try {
-        const response = await fetch(
-          `${this.plugin.settings.syncApiUrl}/api/oauth/session/${sessionId}`,
+      const data = response.json;
+
+      if (data.state === "authorized") {
+        // Success! Save credentials
+        this.plugin.settings.userId = data.userId;
+        this.plugin.settings.token = data.token;
+        this.plugin.settings.apiUrl = data.emailApiUrl;
+        this.plugin.settings.smsApiUrl = data.smsApiUrl;
+        await this.plugin.saveSettings();
+
+        this.stopPolling();
+        this.display(); // Refresh display
+
+        // Show success message
+        const successDiv = document.createElement("div");
+        successDiv.className = "river-success";
+        successDiv.textContent = "✅ Successfully connected to River!";
+        this.containerEl.insertBefore(
+          successDiv,
+          this.containerEl.firstChild,
         );
 
-        if (!response.ok) {
-          throw new Error("Failed to check session status");
-        }
-
-        const data = await response.json();
-
-        if (data.state === "authorized") {
-          // Success! Save credentials
-          this.plugin.settings.userId = data.userId;
-          this.plugin.settings.token = data.token;
-          this.plugin.settings.apiUrl = data.emailApiUrl;
-          this.plugin.settings.smsApiUrl = data.smsApiUrl;
-          await this.plugin.saveSettings();
-
-          this.stopPolling();
-          this.display(); // Refresh display
-
-          // Show success message
-          const successDiv = document.createElement("div");
-          successDiv.className = "river-success";
-          successDiv.textContent = "✅ Successfully connected to River!";
-          this.containerEl.insertBefore(
-            successDiv,
-            this.containerEl.firstChild,
-          );
-
-          // Remove success message after 3 seconds
-          setTimeout(() => {
-            successDiv.remove();
-          }, 3000);
-        } else if (data.state === "expired") {
-          this.stopPolling();
-          console.log("OAuth session expired");
-        }
-      } catch (error) {
-        console.error("Polling error:", error);
+        // Remove success message after 3 seconds
+        setTimeout(() => {
+          successDiv.remove();
+        }, 3000);
+      } else if (data.state === "expired") {
+        this.stopPolling();
+        console.warn("OAuth session expired");
       }
-    }, 2000); // Poll every 2 seconds
+    } catch (error) {
+      console.error("Polling error:", error);
+    }
   }
 
   stopPolling(): void {
